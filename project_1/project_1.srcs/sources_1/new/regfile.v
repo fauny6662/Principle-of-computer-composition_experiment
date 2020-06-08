@@ -27,8 +27,16 @@ module regfile(
     output [32:0] busA,busB
     );
     reg[31:0]rf[31:0]; //寄存器一共32个单元，每个单元32位
+    reg [5:0]i;
     always @(posedge clk)
         if (we) rf[rd]<=wd;
     assign busA=(rs!=0)?rf[rs]:0;
     assign busB=(rt!=0)?rf[rt]:0;
+    initial 
+        begin
+            for(i=0;i<32;i=i+1)
+                begin
+                    rf[i]=32'b0;
+                end
+        end
 endmodule

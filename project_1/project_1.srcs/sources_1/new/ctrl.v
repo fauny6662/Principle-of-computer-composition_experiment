@@ -33,7 +33,8 @@ module ctrl(
     output reg[1:0]Aluop,
     output reg r_type
     );
-    always @(op or !op)
+    
+    always @(*)
         begin
             case(op)
                 6'b000000: //R-type

@@ -27,22 +27,17 @@ module alu(
     output reg [31:0] result
     );
     reg t;
-    always @(op or a or b)
+    always @(*)
         begin
             
             case (op)
                 3'b000:result=a+b; //+u
-                3'b100:result=a+b;  
+                3'b100:result=$signed(a)+$signed(b);  
                 3'b001:result=a-b;  //-u
-                3'b101:result=a-b;  
+                3'b101:result=$signed(a)-$signed(b);  
                 3'b010:result=a|b;
                 3'b011:result=a&b;
-                3'b111:
-                    begin
-                        t=(a<b)?1:0;
-                        result=(a[31]>b[31])?1:t;
-                    end
-                    
+                3'b111:result=($signed(a)<$signed(b))?1:0;  
                 default: result=0;
             endcase
             assign zero =(result==0)? 1:0;

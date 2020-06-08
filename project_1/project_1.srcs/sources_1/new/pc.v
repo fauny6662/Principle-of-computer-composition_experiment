@@ -27,9 +27,8 @@ module pc #(parameter width = 32)
 always @(posedge clk)
  if(rst)
     begin
-        out<=0;
+        out<=32'h0x0000_30000;
     end
-    
  else if(ena)
     out<=data;
 endmodule

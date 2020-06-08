@@ -26,10 +26,13 @@ module Aluctr(
     input [1:0]Aluop,
     output reg [2:0]Aluctr
     );
-    always @(r_type or func or !func)
+    always @(*)
         begin
             if(r_type==0)
                 begin
+                    // if(Aluop==2'b11)
+                    //     Aluctr=3'b100;
+                    // else
                     Aluctr={1'b0,Aluop};
                 end
             else 
