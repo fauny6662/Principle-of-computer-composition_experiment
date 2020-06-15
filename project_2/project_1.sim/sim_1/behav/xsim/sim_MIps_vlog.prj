@@ -1,0 +1,32 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../project_1.srcs/sources_1/new/Aluctr.v" \
+"../../../../project_1.srcs/sources_1/new/If.v" \
+"../../../../project_1.srcs/sources_1/new/Mips.v" \
+"../../../../project_1.srcs/sources_1/new/alu.v" \
+"../../../../project_1.srcs/sources_1/new/control.v" \
+"../../../../project_1.srcs/sources_1/new/ctrl.v" \
+"../../../../project_1.srcs/sources_1/new/datapath.v" \
+"../../../../project_1.srcs/sources_1/new/dm.v" \
+"../../../../project_1.srcs/sources_1/new/exe.v" \
+"../../../../project_1.srcs/sources_1/new/exe_mem.v" \
+"../../../../project_1.srcs/sources_1/new/forward_id.v" \
+"../../../../project_1.srcs/sources_1/new/hazardDetect.v" \
+"../../../../project_1.srcs/sources_1/new/id.v" \
+"../../../../project_1.srcs/sources_1/new/id_exe.v" \
+"../../../../project_1.srcs/sources_1/new/if_id.v" \
+"../../../../project_1.srcs/sources_1/new/im.v" \
+"../../../../project_1.srcs/sources_1/new/mem.v" \
+"../../../../project_1.srcs/sources_1/new/mem_wb.v" \
+"../../../../project_1.srcs/sources_1/new/mux2.v" \
+"../../../../project_1.srcs/sources_1/new/pc.v" \
+"../../../../project_1.srcs/sources_1/new/regfile.v" \
+"../../../../project_1.srcs/sources_1/new/signext.v" \
+"../../../../project_1.srcs/sources_1/new/wb.v" \
+"../../../../project_1.srcs/sim_1/new/sim_MIps.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
