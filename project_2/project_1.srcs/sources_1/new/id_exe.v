@@ -25,23 +25,25 @@ module id_exe(
     input RegDst,
     Branch,
     MemtoReg,
-    Alusrc,
+    Alusrc1,
+    Alusrc2,
     MemWrite,
     MemRead,
     RegWrite,
-    input [2:0]Aluctr,
+    input [4:0]Aluctr,
     input [4:0]rt,rd,
-    input [31:0]immi,busA,busB,pc_4,
+    input [31:0]immi1,immi2,busA,busB,pc_4,
     output reg RegDst_out,
     Branch_out,
     MemtoReg_out,
-    Alusrc_out,
+    Alusrc1_out,
+    Alusrc2_out,
     MemWrite_out,
     MemRead_out,
     RegWrite_out,
-    output reg[2:0]Aluctr_out,
+    output reg[4:0]Aluctr_out,
     output reg [4:0]rt_out,rd_out,
-    output reg [31:0]pc_4_out,busA_out,busB_out,immi_out
+    output reg [31:0]pc_4_out,busA_out,busB_out,immi1_out,immi2_out
     );
     always @(posedge clk)
         begin
@@ -49,25 +51,28 @@ module id_exe(
                 begin
                     Branch_out<=0;
                     MemtoReg_out<=0;
-                    Alusrc_out<=0;
+                    Alusrc1_out<=0;
+                    Alusrc2_out<=0;
                     MemWrite_out<=0;
                     RegWrite_out<=0;
                     MemRead_out<=0;
                     RegDst_out<=0;
-                    Aluctr_out<=3'b0;
+                    Aluctr_out<=5'b0;
                     rd_out<=5'b0;
                     rt_out<=5'b0;
                     pc_4_out<=32'b0;
                     busA_out<=32'b0;
                     busB_out<=32'b0;
-                    immi_out<=32'b0;
+                    immi1_out<=32'b0;
+                    immi2_out<=32'b0;
                 end
             else
                 begin
                     RegDst_out<=RegDst;
                     Branch_out<=Branch;
                     MemtoReg_out<=MemtoReg;
-                    Alusrc_out<=Alusrc;
+                    Alusrc1_out<=Alusrc1;
+                    Alusrc2_out<=Alusrc2;
                     MemWrite_out<=MemWrite;
                     MemRead_out<=MemRead;
                     RegWrite_out<=RegWrite;
@@ -77,7 +82,8 @@ module id_exe(
                     pc_4_out<=pc_4;
                     busA_out<=busA;
                     busB_out<=busB;
-                    immi_out<=immi;
+                    immi1_out<=immi1;
+                    immi2_out<=immi2;
                 end
 
         end

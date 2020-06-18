@@ -25,15 +25,16 @@ module exe(
     input RegDst,
     Branch,
     MemtoReg,
-    Alusrc,
+    Alusrc1,
+    Alusrc2,
     MemWrite,
     MemRead,
     RegWrite,
-    input [2:0]Aluctr,
+    input [4:0]Aluctr,
     input [4:0]rt,rd,
     input [31:0]pc_4,
     input [31:0]busA,busB,
-    input [31:0]immi,
+    input [31:0]immi1,immi2,
     output 
     Branch_out,
     MemtoReg_out,
@@ -44,7 +45,7 @@ module exe(
     output zero,
     output [4:0]rd_out
     );
-    wire [31:0]busC;
+    wire [31:0]busC,busD;
     assign rd_out=(RegDst==0)?rt:rd;
     assign Branch_out=Branch;
     assign MemtoReg_out=MemtoReg;
@@ -52,7 +53,8 @@ module exe(
     assign MemRead_out=MemRead;
     assign RegWrite_out=RegWrite;
     assign busB_out=busB;
-    mux2 mu1(immi,busB,Alusrc,busC);
-    alu alu1(Aluctr,busA,busC,zero,Aluout);
+    mux2 mu1(immi1,busA,Alusrc1,busC);
+    mux2 mu2(immi2,busB,Alusrc2,busD);
+    alu alu1(Aluctr,busC,busD,zero,Aluout);
     // npc npc1(immi,Branch,zero,pc_4,npc);
 endmodule

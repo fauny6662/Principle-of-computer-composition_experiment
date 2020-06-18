@@ -33,24 +33,27 @@ module id(
     output RegDst,
     Branch,
     MemtoReg,
-    Alusrc,
+    Alusrc1,
+    Alusrc2,
     MemWrite,
     MemRead,
     RegWrite,
     Jump,
-    output [2:0]Aluctr,
+    output [4:0]Aluctr,
     output [4:0]rs,rt,rd,
-    output [31:0]immi,
+    output [31:0]immi_1, immi_2,
     output reg [31:0]out1,out2,
     output [31:0]pc_4_out
     );
     wire [1:0]hd_rs,hd_rt;
     wire [31:0]busA,busB;
-    control control1(instruction,
+    control control1(instruction[31:26],
+    instruction[5:0],
     RegDst,
     Branch,
     MemtoReg,
-    Alusrc,
+    Alusrc1,
+    Alusrc2,
     MemWrite,
     MemRead,
     RegWrite,
@@ -74,7 +77,8 @@ module id(
     // instruction[25:0],immi,pc,busA,busB,
     // );
     regfile regfile1(clk,RegWrite_wb,rs,rt,rd_wb,data_wb,busA,busB);
-    signext signext1(instruction[15:0],Extop,immi);
+    assign immi_1 = {{27{1'b0}},instruction[10:6]};
+    signext signext1(instruction[15:0],Extop,immi_2);
     always @(*)
         begin
             if(hd_rs==2'b01)

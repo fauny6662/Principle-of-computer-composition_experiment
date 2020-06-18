@@ -26,7 +26,7 @@ module hazardDetect(
     input lw_pre,
     input branch,
     input jump,
-    input [25:0]jpc,
+    input [31:0]instruction_id,
     input [31:0]bpc,pc,
     input [31:0]a,b,
     output reg PcWrite,
@@ -47,9 +47,9 @@ module hazardDetect(
                             PcWrite=0;
                         end
                 end
-            else if(branch==1)
+            else if(branch==1)//beq bne bgez blez四种指令
                 begin
-                    if(a==b)
+                    if((instruction_id[31:26]==6'b000100&&a==b)||(instruction_id[31:26]==6'b000101&&a!=b)||(instruction_id[31:26]==6'b000001&&rt_id==5'b00001&&a>=0)||(instruction_id[31:26]==6'b000110&&a<=0))
                         begin
                             pc_flush=1;
                             if_idWrite=0;
@@ -58,13 +58,24 @@ module hazardDetect(
                             address_out=pc+{bpc[29:0],2'b00}+4;
                         end
                 end
-            else if(jump==1)
+            else if(jump==1)//j jr两种指令
                 begin
-                    pc_flush=1;
-                    if_idWrite=0;
-                    PcWrite=1;
-                    pc_src=1;
-                    address_out={pc[31:28],jpc,2'b00};
+                    if(instruction_id[31:26]==6'b000010)
+                        begin
+                            pc_flush=1;
+                            if_idWrite=0;
+                            PcWrite=1;
+                            pc_src=1;
+                            address_out={pc[31:28],instruction_id[25:0],2'b00};
+                        end
+                    if(instruction_id[31:26]==6'b000000)
+                        begin
+                            pc_flush=1;
+                            if_idWrite=0;
+                            PcWrite=1;
+                            pc_src=1;
+                            address_out=a;
+                        end
                 end
             else
                 begin
@@ -72,7 +83,7 @@ module hazardDetect(
                     if_idWrite=1;
                     PcWrite=1;
                     pc_src=0;
-                    address_out=0;
+                    address_out=32'b0;
                 end
         end
 endmodule

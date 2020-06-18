@@ -22,7 +22,7 @@
 
 module If(
     input clk,reset,
-    input [31:0]address,
+    input [31:0]address,//跳转地址
     input [31:0]pc_in,
     input PcWrite,pc_src,pc_flush,
     output reg [31:0] pc_4,

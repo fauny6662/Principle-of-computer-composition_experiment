@@ -28,7 +28,7 @@ module pc #(parameter width = 32)
     always @(posedge clk)
     if(rst)
         begin
-            pc_out<=32'h0x0000_30000;
+            pc_out<=32'h0x0000_3000;
             
         end
     else if(ena)

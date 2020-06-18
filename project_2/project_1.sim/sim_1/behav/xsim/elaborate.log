@@ -11,8 +11,6 @@ Compiling module xil_defaultlib.pc
 Compiling module xil_defaultlib.im_4k
 Compiling module xil_defaultlib.If
 Compiling module xil_defaultlib.if_id
-Compiling module xil_defaultlib.ctrl
-Compiling module xil_defaultlib.Aluctr
 Compiling module xil_defaultlib.control
 Compiling module xil_defaultlib.forward_id
 Compiling module xil_defaultlib.regfile

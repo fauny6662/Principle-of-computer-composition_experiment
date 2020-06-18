@@ -1,11 +1,9 @@
 # compile verilog/system verilog design source files
 verilog xil_defaultlib  \
-"../../../../project_1.srcs/sources_1/new/Aluctr.v" \
 "../../../../project_1.srcs/sources_1/new/If.v" \
 "../../../../project_1.srcs/sources_1/new/Mips.v" \
 "../../../../project_1.srcs/sources_1/new/alu.v" \
 "../../../../project_1.srcs/sources_1/new/control.v" \
-"../../../../project_1.srcs/sources_1/new/ctrl.v" \
 "../../../../project_1.srcs/sources_1/new/datapath.v" \
 "../../../../project_1.srcs/sources_1/new/dm.v" \
 "../../../../project_1.srcs/sources_1/new/exe.v" \

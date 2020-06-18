@@ -21,24 +21,33 @@
 
 
 module alu(
-    input [2:0] op,
+    input [4:0] op,
     input [31:0] a,b,
     output reg zero,
     output reg [31:0] result
     );
-    reg t;
+    reg [4:0] t;//t为指令中sa，或$rs值的低五位的值
     always @(*)
         begin
-            
+            t=a[4:0];
             case (op)
-                3'b000:result=a+b; //+u
-                3'b100:result=$signed(a)+$signed(b);  
-                3'b001:result=a-b;  //-u
-                3'b101:result=$signed(a)-$signed(b);  
-                3'b010:result=a|b;
-                3'b011:result=a&b;
-                3'b111:result=($signed(a)<$signed(b))?1:0;  
-                3'b110:result={b[15:0],{16{1'b0}}};
+                5'b10001:result=a+b; //无符号加
+                5'b10000:result=$signed(a)+$signed(b);//带符号加  
+                5'b10011:result=a-b;  //无符号减
+                5'b10010:result=$signed(a)-$signed(b);//带符号减
+                5'b10101:result=a|b;
+                5'b10100:result=a&b;
+                5'b11011:result=(a<b)?1:0;//无符号比较
+                5'b11010:result=($signed(a)<$signed(b))?1:0;//带符号比较  
+                5'b11000:result={b[15:0],{16{1'b0}}};//lui
+                5'b10111:result=~(a|b);//或非
+                5'b10110:result=a^b;//异或
+                5'b00000:result=b<<t;//逻辑左移
+                5'b00100:result=b<<t;
+                5'b00010:result=b>>t;//逻辑右移
+                5'b00110:result=b>>t;
+                5'b00011:result=({32{b[31]}}<<(6'd32-{1'b0,t}))|(b>>t);//算术右移
+                5'b00111:result=({32{b[31]}}<<(6'd32-{1'b0,t}))|(b>>t);
                 default: result=0;
             endcase
             assign zero =(result==0)? 1:0;
