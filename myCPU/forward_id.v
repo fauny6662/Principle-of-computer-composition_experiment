@@ -23,8 +23,6 @@
 module forward_id(
     input [4:0]rs_id,
     rt_id,
-    // rs_exe,
-    // rt_exe,
     rd_exe,
     rd_mem,
     input RegWrite_exe,

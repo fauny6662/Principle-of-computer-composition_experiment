@@ -52,7 +52,6 @@ module exe_mem(
                     zero_out<=0;
                     rd_out<=5'b0;
                     pc_out<=32'b0;
-                    
                 end
             else
                 begin

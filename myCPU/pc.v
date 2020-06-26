@@ -23,7 +23,6 @@
 module pc #(parameter width = 32)
     (input ena,clk,rst,
     input [width-1:0] npc,
-    // input [31:0] address,
     output reg [width-1:0] pc_out);
     always @(posedge clk)
     if(rst)
@@ -34,6 +33,4 @@ module pc #(parameter width = 32)
         begin
             pc_out<=npc;
         end
-    // initial 
-    //     pc_out=32'b0;
 endmodule

@@ -21,7 +21,7 @@
 
 
 module control(
-    input clk,ctrl,
+    input clk,ctrl,//ctrl是保证跳转指令的id段之后的控制信号都是0
     input [5:0] op,
     input [5:0] func,
     input [31:0]instruction,
@@ -66,16 +66,14 @@ module control(
         begin
             if(R|addi|addiu|slti|sltiu|andi|ori|lui|xori|beq|bne|bgez|bgtz|blez|bltz|lb|lh|lw|sb|sh|sw|nop|jal==1)
                 begin
-                    //if(ctrl==0)
                     keep=0;
                 end  
             else if(ctrl == 0)
                 keep=1;
         end
     always @(*)
-        begin        
-            if(nop==1)
-           // if(ctrl==1|nop==1)
+        begin
+            if(ctrl==1|nop==1)
                 begin
                     RegDst=0;
                     Branch=0;
@@ -120,17 +118,7 @@ module control(
                     Extop = addi | addiu | slti | sltiu | MemtoReg | sb | sh | sw | Branch;
                 end
         end
-    // assign RegDst = R;
-    // assign Branch = beq | bne | bgez | blez;
-    // assign MemtoReg = lb | lh | lw;
-    // assign Alusrc1 = (R == 1) && (func==6'b000000 || func[5:1]==5'b00001);
-    // assign Alusrc2 = MemRead | MemWrite | addi | addiu | slti | sltiu | andi | ori | lui | xori;
-    // assign MemWrite = sb | sh | sw;
-    // assign MemRead = lb | lh | lw;
-    // assign RegWrite = R | addi | addiu | slti | sltiu | andi | ori | lui | xori | MemRead;
-    // assign Jump = (op == 6'b000010 || (op == 6'b000000 && func == 6'b001000)) ? 1 : 0;
-    // assign Extop = addi | addiu | slti | sltiu | MemRead | MemWrite;
-    //生成5位的ALUctr
+
     always @(*)
     begin
         if(R)

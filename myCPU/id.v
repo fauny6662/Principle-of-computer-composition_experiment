@@ -47,7 +47,7 @@ module id(
     );
     wire [1:0]hd_rs,hd_rt;
     wire [31:0]busA,busB;
-    control control1(clk,reset,ctrl,
+    control control1(clk,ctrl,
     instruction[31:26],
     instruction[5:0],
     instruction,
@@ -63,22 +63,15 @@ module id(
     MemWrite,
     MemRead,
     Aluctr);
-    // wire [4:0]wa;
-    // wire [4:0]rs;
     assign rs=instruction[25:21];
     assign rt=(Jump==2'b11)?5'b11111:instruction[20:16];
     assign rd=instruction[15:11];
-    // assign wa=(RegDst==0)?rt:rd;
     assign pc_4_out=pc_4;
     forward_id forward_id1(rs,rt,rd_exe,rd_mem,
     RegWrite_exe,
     RegWrite_mem,
     MemRead_mem,
     hd_rs,hd_rt);
-    // hazardDetect  hazardDetect1(clk,reset,rs,rt,rt_exe,
-    // MemRead_exe&RegWrite_exe,Branch,jump,
-    // instruction[25:0],immi,pc,busA,busB,
-    // );
     regfile regfile1(clk,RegWrite_wb,rs,rt,rd_wb,data_wb,busA,busB);
     assign immi_1 = {{27{1'b0}},instruction[10:6]};
     signext signext1(instruction[15:0],Extop,immi_2);

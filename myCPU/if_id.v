@@ -21,12 +21,9 @@
 
 
 module if_id(
-    input clk,reset,if_flush,if_id_write,if_lw,
+    input clk,reset,if_flush,if_lw,if_id_write,
     input [31:0]pc,pc_4,
-    // instruction_in,
-    // input we,
     output reg [31:0]pc_out,pc_4_out
-    //, instruction_out
     );
     reg [31:0]a,b;
     always @(posedge clk)
@@ -35,20 +32,15 @@ module if_id(
                 begin
                     pc_out<=32'b0;
                     pc_4_out<=32'b0;
-                    // instruction_out<=32'b0;
-                    // instr_out<=32'b0;
                 end
             else if(if_lw==1)
-                begin
-                    ;
-                end
+                ;//bubble
             else 
                 begin
                      if(if_id_write==1)
                         begin
                             pc_out<=pc;
                             pc_4_out<=pc_4;
-                            // instruction_out<=instruction_in;
                         end
                     else
                         begin
@@ -62,7 +54,7 @@ module if_id(
                             pc_4_out<=32'b0;
                         end
                 end
-             a=pc_out;
-             b=pc_4_out;
-         end
+            a=pc_out;
+            b=pc_4_out;
+        end
 endmodule

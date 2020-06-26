@@ -119,8 +119,5 @@ module hazardDetect(
                                     address_out={pc[31:28],instruction_id[25:0],2'b00};
                                 end
                         end
-                
-                // end
-                
         end
 endmodule

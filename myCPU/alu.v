@@ -53,11 +53,13 @@ module alu(
             endcase
             assign zero =(result==0)? 1:0;
             overflow=0;
-            if(op==5'b10000&&a[31]==b[31]&&a[31]!=result[31])
+            /*if(op==5'b10000|op==5'b10010)
                 begin
-                    
+                    if(result[31]==1)
                         overflow=1; 
-                end
+                end*/
+            if(op==5'b10000&&a[31]==b[31]&&a[31]!=result[31])
+                overflow=1;
         end
     initial 
         begin

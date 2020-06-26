@@ -69,5 +69,4 @@ module exe(
     mux2 mu1(immi1,busA,Alusrc1,busC);
     mux2 mu2(immi2,busB,Alusrc2,busD);
     alu alu1(Aluctr,busC,busD,zero,overflow,Aluout);
-    // npc npc1(immi,Branch,zero,pc_4,npc);
 endmodule
