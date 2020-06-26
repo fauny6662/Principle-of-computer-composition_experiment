@@ -21,13 +21,14 @@
 
 
 module if_id(
-    input clk,reset,if_flush,if_id_write,
+    input clk,reset,if_flush,if_id_write,if_lw,
     input [31:0]pc,pc_4,
     // instruction_in,
     // input we,
     output reg [31:0]pc_out,pc_4_out
     //, instruction_out
     );
+    reg [31:0]a,b;
     always @(posedge clk)
         begin
             if(reset==1)
@@ -36,6 +37,10 @@ module if_id(
                     pc_4_out<=32'b0;
                     // instruction_out<=32'b0;
                     // instr_out<=32'b0;
+                end
+            else if(if_lw==1)
+                begin
+                    ;
                 end
             else 
                 begin
@@ -47,15 +52,17 @@ module if_id(
                         end
                     else
                         begin
+                            pc_out<=a+8;
+                            pc_4_out<=b+8;
+                        end    
+                
+                    if(if_flush==1)
+                        begin
                             pc_out<=32'b0;
                             pc_4_out<=32'b0;
-                            // instruction_out<=instruction_in;
-                        end    
+                        end
                 end
-            if(if_flush==1)
-                begin
-                    pc_out<=32'b0;
-                    pc_4_out<=32'b0;
-                end
-        end
+             a=pc_out;
+             b=pc_4_out;
+         end
 endmodule

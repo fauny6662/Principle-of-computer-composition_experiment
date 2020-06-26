@@ -25,7 +25,7 @@ module hazardDetect(
     input [4:0]rs_id,rt_id,rt_exe,
     input [1:0]lw_pre,
     input branch,
-    input jump,
+    input [1:0]jump,
     input [31:0]instruction_id,
     input [31:0]bpc,pc,
     input [31:0]a,b,
@@ -34,18 +34,26 @@ module hazardDetect(
     pc_flush,
     pc_src,
     ctrl,
-    jal_en,
-    output reg [31:0]address_out,jal_wdata
+    id_lw,
+    if_lw,
+    output reg [31:0]address_out
     );
     reg [31:0] A, B;
+    wire [31:0]c;
+    reg f;
+    assign c=a-b;
     always @(negedge clk)
         begin
-            // if(reset==1)
-            //     begin
-            //         inst_sram_en=0;
-            //     end
-            // else
-                // begin
+            f=0;
+            pc_flush=0;
+            if_idWrite=1;
+            PcWrite=1;
+            pc_src=0;
+            ctrl=0;
+            id_lw=0;
+            if_lw=0;
+            address_out=32'b0;
+                    #0.5;
                     if(lw_pre!=2'b00) //前一条lw/lh/lb
                         begin
                             if(rt_exe==rs_id||rt_exe==rt_id)
@@ -53,75 +61,65 @@ module hazardDetect(
                                     pc_flush=1;
                                     if_idWrite=0;
                                     PcWrite=0;
-
-                                    jal_en = 0;
-                                    jal_wdata = 31'b0;
+                                    id_lw=1;
+                                    if_lw=1;
                                     ctrl=0;
+                                    f=1;
                                 end
                         end
-                    else if(branch==1)//beq bne bgez blez四种指令
+                    #0.5;
+                    if(branch==1&&f==0)//beq bne bgez bgtz blez bltz六种指令
                         begin
-                            if((instruction_id[31:26]==6'b000100&&a==b)||(instruction_id[31:26]==6'b000101&&a!=b)||(instruction_id[31:26]==6'b000001&&rt_id==5'b00001&&a>=0)||(instruction_id[31:26]==6'b000110&&a<=0))
+                            if((instruction_id[31:26]==6'b000100&&c==32'b0)||(instruction_id[31:26]==6'b000101&&c!=32'b0)||(instruction_id[31:26]==6'b000001&&rt_id==5'b00001&&$signed(a)>=0)||(instruction_id[31:26]==6'b000111&&$signed(a)>0)||(instruction_id[31:26]==6'b000110&&$signed(a)<=0)||(instruction_id[31:26]==6'b000001&&rt_id==5'b00000&&$signed(a)<0))
                                 begin
                                     pc_flush=0;
                                     if_idWrite=0;
                                     PcWrite=1;
                                     pc_src=1;
-                                    
-                                    jal_en = 0;
-                                    jal_wdata = 31'b0;
+                                    id_lw=0;
+                                    if_lw=0;
                                     ctrl=1;
                                     address_out=pc+{bpc[29:0],2'b00}+4;
+                                    
                                 end
                         end
-                    else if(jump==1)//j jr jal三种指令
+                    else if(jump!=2'b00&&f==0)//j jr jal三种指令
                         begin
-                            if(instruction_id[31:26]==6'b000010)
+                            if(jump==2'b01)
                                 begin
                                     pc_flush=0;
-                                    if_idWrite=0;
-                                    PcWrite=0;
-                                    pc_src=1;
-                                    ctrl=1;
-                                    jal_en = 0;
-                                    jal_wdata = 31'b0;
-                                    address_out={pc[31:28],instruction_id[25:0],2'b00};
-                                end
-                            else if(instruction_id[31:26]==6'b000000)  //jr
-                                begin
-                                    pc_flush=0;
-                                    if_idWrite=0;
+                                    if_idWrite=1;
                                     PcWrite=1;
                                     pc_src=1;
                                     ctrl=1;
-                                    jal_en = 0;
-                                    jal_wdata = 31'b0;
+                                    id_lw=0;
+                                    if_lw=0;
+                                    address_out={pc[31:28],instruction_id[25:0],2'b00};
+                                end
+                            else if(jump==2'b10)  //jr
+                                begin
+                                    pc_flush=0;
+                                    if_idWrite=1;
+                                    PcWrite=1;
+                                    pc_src=1;
+                                    ctrl=1;
+                                    id_lw=0;
+                                    if_lw=0;
                                     address_out=a;
                                 end
-                            else if(instruction_id[31:26]==6'b000011)//jal
+                            else if(jump==2'b11)//jal
                                 begin
                                     pc_flush=0;
                                     if_idWrite=0;
                                     PcWrite=1;
                                     pc_src=1;
-                                    ctrl=1;
-                                    
+                                    ctrl=0;
+                                    id_lw=0;
+                                    if_lw=0;
                                     address_out={pc[31:28],instruction_id[25:0],2'b00};
-                                    jal_en = 1;
-                                    jal_wdata=pc+4;
                                 end
                         end
-                    else
-                        begin
-                            pc_flush=0;
-                            if_idWrite=1;
-                            PcWrite=1;
-                            pc_src=0;
-                            ctrl=0;
-                            jal_en = 0;
-                            jal_wdata = 31'b0;
-                            address_out=32'b0;
-                        end
+                
                 // end
                 
         end

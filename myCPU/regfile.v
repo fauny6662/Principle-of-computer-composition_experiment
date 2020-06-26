@@ -21,17 +21,16 @@
 
 
 module regfile(
-    input clk,we,jal_en,
+    input clk,we,
     input [4:0] rs,rt,rd,
-    input [31:0]wd,jal_wdata,
+    input [31:0]wd,
     output   [31:0] busA,busB
     );
     reg[31:0]rf[31:0]; //寄存器一共32个单元，每个单元32位
     reg [5:0]i;
     always @(negedge clk)
     begin
-        if(jal_en) rf[5'b11111]<=jal_wdata;
-        else if(we) rf[rd]<=wd;
+        if(we) rf[rd]<=wd;
     end 
     assign   busA=(rs!=0)?rf[rs]:0;
     assign   busB=(rt!=0)?rf[rt]:0;

@@ -25,11 +25,13 @@ module mem_wb(
     input 
     MemtoReg,
     RegWrite,
-    input [31:0]Aluout,pc,
+    input [1:0]MemWrite,MemRead,
+    input [31:0]Aluout,pc,busB,radata,
     input [4:0]rd,
     output reg MemtoReg_out ,
     RegWrite_out,
-    output reg [31:0]Aluout_out,pc_out,
+    output reg [1:0]MemWrite_out,MemRead_out,
+    output reg [31:0]Aluout_out,pc_out,busB_out,rdata_out,
     output reg [4:0]rd_out 
     );
     always @(posedge clk)
@@ -38,17 +40,27 @@ module mem_wb(
                 begin
                     MemtoReg_out<=0;
                     RegWrite_out<=0;
+                    MemWrite_out<=2'b00;
+                    MemRead_out<=2'b00;
                     Aluout_out<=32'b0;
                     rd_out<=5'b0;
                     pc_out<=32'b0;
+                    busB_out=32'b0;
+                    rdata_out<=0;
+                    
                 end
             else 
                 begin
                     MemtoReg_out<=MemtoReg;
                     RegWrite_out<=RegWrite;
+                    MemWrite_out<=MemWrite;
+                    MemRead_out<=MemRead;
                     Aluout_out<=Aluout;
                     rd_out<=rd;
                     pc_out<=pc;
+                    busB_out<=busB;
+                    rdata_out<=radata;
+                    
                 end
         end
 endmodule

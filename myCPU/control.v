@@ -21,7 +21,7 @@
 
 
 module control(
-    input ctrl,
+    input clk,ctrl,
     input [5:0] op,
     input [5:0] func,
     input [31:0]instruction,
@@ -32,13 +32,13 @@ module control(
     Alusrc1,//busA端的输入来自立即数
     Alusrc2,//busB端的输入来自立即数
     RegWrite,
-    Jump,
-    Extop,
+    output reg[1:0] Jump,//j/jr/jal
+    output reg Extop,
     keep,
     output reg [1:0] MemWrite, MemRead,//内存的读和写分别有三种方式
     output reg [4:0] ALUctr);
 
-    wire R, addi, addiu, slti, sltiu, andi, ori, lui, xori, beq, bne, bgez, blez, lb, lh, lw, sb, sh, sw,nop;
+    wire R, addi, addiu, slti, sltiu, andi, ori, lui, xori, beq, bne, bgez, bgtz, blez, bltz, lb, lh, lw, sb, sh, sw,jal,nop;
     assign R = (op == 6'b000000) ? 1 : 0;
     assign addi = (op == 6'b001000) ? 1 : 0;
     assign addiu = (op == 6'b001001) ? 1 : 0;
@@ -50,23 +50,32 @@ module control(
     assign xori = (op == 6'b001110) ? 1 : 0;
     assign beq = (op == 6'b000100) ? 1 : 0;
     assign bne = (op == 6'b000101) ? 1 : 0;
-    assign bgez = (op == 6'b000001) ? 1 : 0;
+    assign bgez = (op == 6'b000001 && instruction[20:16] == 5'b00001) ? 1 : 0;
+    assign bgtz = (op == 6'b000111) ? 1 : 0;
     assign blez = (op == 6'b000110) ? 1 : 0;
+    assign bltz = (op == 6'b000001 && instruction[20:16] == 5'b00000) ? 1 : 0;
     assign lb = (op == 6'b100000) ? 1 : 0;
     assign lh = (op == 6'b100001) ? 1 : 0;
     assign lw = (op == 6'b100011) ? 1 : 0;
     assign sb = (op == 6'b101000) ? 1 : 0;
     assign sh = (op == 6'b101001) ? 1 : 0;
     assign sw = (op == 6'b101011) ? 1 : 0;
+    assign jal = (op == 6'b000011) ? 1 : 0;
     assign nop =(instruction==0)? 1:0;
-
-    always @(*)
+    always @(posedge clk)
         begin
-            if(R|addi|addiu|slti|sltiu|andi|ori|lui|xori|beq|bne|bgez|blez|lb|lh|lw|sb|sh|sw|nop==1)
-                keep=0;
-            else
+            if(R|addi|addiu|slti|sltiu|andi|ori|lui|xori|beq|bne|bgez|bgtz|blez|bltz|lb|lh|lw|sb|sh|sw|nop|jal==1)
+                begin
+                    //if(ctrl==0)
+                    keep=0;
+                end  
+            else if(ctrl == 0)
                 keep=1;
-            if(ctrl==1|nop==1)
+        end
+    always @(*)
+        begin        
+            if(nop==1)
+           // if(ctrl==1|nop==1)
                 begin
                     RegDst=0;
                     Branch=0;
@@ -76,13 +85,13 @@ module control(
                     MemWrite=2'b00;
                     MemRead=2'b00;
                     RegWrite=0;
-                    Jump=0;
+                    Jump=2'b00;
                     Extop=0;
                 end
             else
                 begin
                     RegDst = R;
-                    Branch = beq | bne | bgez | blez;
+                    Branch = beq | bne | bgez | bgtz | blez | bltz;
                     MemtoReg = lb | lh | lw;
                     Alusrc1 = (R == 1) && (func==6'b000000 || func[5:1]==5'b00001);
                     Alusrc2 = MemtoReg | sb | sh | sw | addi | addiu | slti | sltiu | andi | ori | lui | xori;
@@ -100,9 +109,15 @@ module control(
                     else if(sw == 1)
                         MemWrite = 2'b11;
                     else MemWrite = 2'b00;
-                    RegWrite = R | addi | addiu | slti | sltiu | andi | ori | lui | xori | MemtoReg;
-                    Jump = (op[5:1] == 5'b00001 || (op == 6'b000000 && func == 6'b001000)) ? 1 : 0;
-                    Extop = addi | addiu | slti | sltiu | MemtoReg | sb | sh | sw;
+                    RegWrite = R | addi | addiu | slti | sltiu | andi | ori | lui | xori | MemtoReg | jal;
+                    if(op == 6'b000010)//j
+                        Jump = 2'b01;
+                    else if(op == 6'b000000 && func == 6'b001000)//jr
+                        Jump = 2'b10;
+                    else if(op == 6'b000011)//jal
+                        Jump = 2'b11;
+                    else Jump = 2'b00;
+                    Extop = addi | addiu | slti | sltiu | MemtoReg | sb | sh | sw | Branch;
                 end
         end
     // assign RegDst = R;
@@ -138,6 +153,7 @@ module control(
                     6'b101000 : ALUctr = 5'b10001;
                     6'b101001 : ALUctr = 5'b10001;
                     6'b101011 : ALUctr = 5'b10001;
+                    6'b000011 : ALUctr = 5'b01000;
                     default: ALUctr = 0;
                 endcase
             end

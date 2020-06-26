@@ -26,21 +26,23 @@ module mem(
     MemtoReg,
     input [1:0]MemWrite,MemRead,
     input RegWrite,
-    input [31:0]Aluout,busB,data_sram_rdata,
+    input [31:0]Aluout,busB,
     input zero,
     input [4:0]rd,
-    output [3:0] data_sram_wen,
-    output [31:0] data_sram_wdata, rdata,//内存中实际读出的数据
     output br,
     output MemtoReg_out,
     output RegWrite_out,
-    output [31:0]Aluout_out,
+    output [1:0]MemWrite_out,MemRead_out,
+    output [31:0]Aluout_out,busB_out,
     output [4:0]rd_out
     );
     assign MemtoReg_out=MemtoReg;
     assign RegWrite_out=RegWrite;
+    assign MemWrite_out=MemWrite;
+    assign MemRead_out=MemRead;
     assign Aluout_out=Aluout;
     assign br=Branch&zero;
     assign rd_out=rd;
-    rst_DM rst1(Aluout,busB,data_sram_rdata,MemRead,MemWrite,data_sram_wen,data_sram_wdata,rdata);
+    assign busB_out=busB;
+    //rst_DM rst1(Aluout,busB,data_sram_rdata,MemRead,MemWrite,data_sram_wen,data_sram_wdata,rdata);
 endmodule

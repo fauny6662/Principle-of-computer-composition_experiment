@@ -21,7 +21,7 @@
 
 
 module id_exe(
-    input clk,reset,ctrl,id_flush,
+    input clk,reset,ctrl,id_flush,id_lw,
     input RegDst,
     Branch,
     MemtoReg,
@@ -37,6 +37,7 @@ module id_exe(
     MemtoReg_out,
     Alusrc1_out,
     Alusrc2_out,
+    id_lw_out,
     output reg [1:0]MemWrite_out,MemRead_out,
     output reg RegWrite_out,
     output reg[4:0]Aluctr_out,
@@ -45,7 +46,7 @@ module id_exe(
     );
     always @(posedge clk)
         begin
-            if(reset==1|id_flush)
+            if(reset==1||id_flush==1)
                 begin
                     Branch_out<=0;
                     MemtoReg_out<=0;
@@ -64,6 +65,28 @@ module id_exe(
                     immi1_out<=32'b0;
                     immi2_out<=32'b0;
                     pc_out<=32'b0;
+                    id_lw_out<=0;
+                end
+            else if(id_lw==1)
+                begin
+                    Branch_out<=0;
+                    MemtoReg_out<=0;
+                    Alusrc1_out<=0;
+                    Alusrc2_out<=0;
+                    MemWrite_out<=2'b00;
+                    RegWrite_out<=0;
+                    MemRead_out<=2'b00;
+                    RegDst_out<=0;
+                    Aluctr_out<=5'b0;
+                    rd_out<=5'b0;
+                    rt_out<=5'b0;
+                    pc_4_out<=32'b0;
+                    busA_out<=32'b0;
+                    busB_out<=32'b0;
+                    immi1_out<=32'b0;
+                    immi2_out<=32'b0;
+                    pc_out<=32'b0;
+                    id_lw_out<=1;
                 end
             else
                 begin
@@ -84,6 +107,7 @@ module id_exe(
                     immi1_out<=immi1;
                     immi2_out<=immi2;
                     pc_out<=pc;
+                    id_lw_out<=0;
                 end
 
         end

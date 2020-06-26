@@ -27,7 +27,7 @@ module exe_mem(
     MemtoReg,
     input [1:0]MemWrite,MemRead,
     input RegWrite,
-    input [31:0]Aluout,busB,pc,address,
+    input [31:0]Aluout,busB,pc,
     input zero,
     input [4:0]rd,
     output reg Branch_out,
@@ -52,6 +52,7 @@ module exe_mem(
                     zero_out<=0;
                     rd_out<=5'b0;
                     pc_out<=32'b0;
+                    
                 end
             else
                 begin

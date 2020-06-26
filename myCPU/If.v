@@ -24,7 +24,7 @@ module If(
     input clk,reset,
     input [31:0]address,error_address,//跳转地址
     input [31:0]pc_in,
-    input PcWrite,pc_src,pc_flush,error,
+    input PcWrite,pc_src,pc_flush,if_lw,error,
     output reg [31:0] pc_4,
     output [31:0]pc_out
     );
@@ -34,7 +34,7 @@ module If(
     pc pc1(PcWrite,clk,reset,npc,pc_out);
     always@(*)
         begin
-            if(pc_flush==1)
+            if(pc_flush==1||if_lw==1)
                 pc_4=pc_out;
             else
                 pc_4=pc_out+4;

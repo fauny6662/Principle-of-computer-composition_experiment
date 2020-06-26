@@ -21,8 +21,8 @@
 
 
 module id(
-    input clk,reset,ctrl,jal_en,
-    input [31:0]pc,pc_4,instruction,jal_wdata,
+    input clk,reset,ctrl,id_lw,id_lw_exe,
+    input [31:0]pc,pc_4,instruction,
     input [31:0]Aluout_exe,Aluout_mem,Rdata_mem,data_wb,
     input [4:0]rd_exe,rd_mem,rd_wb,
     input  
@@ -36,8 +36,8 @@ module id(
     Alusrc1,
     Alusrc2,
     RegWrite,
-    Jump,
-    keep,
+    output [1:0]Jump,
+    output keep,
     output [1:0]MemWrite,MemRead,
     output [4:0]Aluctr,
     output [4:0]rs,rt,rd,
@@ -47,7 +47,7 @@ module id(
     );
     wire [1:0]hd_rs,hd_rt;
     wire [31:0]busA,busB;
-    control control1(ctrl,
+    control control1(clk,reset,ctrl,
     instruction[31:26],
     instruction[5:0],
     instruction,
@@ -66,7 +66,7 @@ module id(
     // wire [4:0]wa;
     // wire [4:0]rs;
     assign rs=instruction[25:21];
-    assign rt=instruction[20:16];
+    assign rt=(Jump==2'b11)?5'b11111:instruction[20:16];
     assign rd=instruction[15:11];
     // assign wa=(RegDst==0)?rt:rd;
     assign pc_4_out=pc_4;
@@ -79,27 +79,43 @@ module id(
     // MemRead_exe&RegWrite_exe,Branch,jump,
     // instruction[25:0],immi,pc,busA,busB,
     // );
-    regfile regfile1(clk,RegWrite_wb,jal_en,rs,rt,rd_wb,data_wb,jal_wdata,busA,busB);
+    regfile regfile1(clk,RegWrite_wb,rs,rt,rd_wb,data_wb,busA,busB);
     assign immi_1 = {{27{1'b0}},instruction[10:6]};
     signext signext1(instruction[15:0],Extop,immi_2);
     always @(*)
         begin
-            if(hd_rs==2'b01)
-                out1=Aluout_exe;
-            else if(hd_rs==2'b10)
-                out1=Aluout_mem;
-            else if(hd_rs==2'b11)
-                out1=Rdata_mem;
-            else if(hd_rs==2'b00)
-                out1=busA;
-            if(hd_rt==2'b00)
-                out2=busB;
-            else if(hd_rt==2'b01)
-                out2=Aluout_exe;
-            else if(hd_rt==2'b10)
-                out2=Aluout_mem;
-            else if(hd_rt==2'b11)
-                out2=Rdata_mem;
+            if(Jump==2'b11)//如果是jal指令
+                begin
+                    out1=pc+8;
+                    out2=32'b0;
+                end
+            else if(id_lw==1)
+                begin
+                    if(hd_rs==2'b11)
+                        out1=Rdata_mem;
+                    if(hd_rt==2'b11)
+                        out2=Rdata_mem;
+                end
+            else if(id_lw_exe==0)
+                begin
+                    if(hd_rs==2'b01)
+                        out1=Aluout_exe;
+                    else if(hd_rs==2'b10)
+                        out1=Aluout_mem;
+                    else if(hd_rs==2'b11)
+                        out1=Rdata_mem;
+                    else if(hd_rs==2'b00)
+                        out1=busA;
+                    if(hd_rt==2'b00)
+                        out2=busB;
+                    else if(hd_rt==2'b01)
+                        out2=Aluout_exe;
+                    else if(hd_rt==2'b10)
+                        out2=Aluout_mem;
+                    else if(hd_rt==2'b11)
+                        out2=Rdata_mem;
+                end
+            
         end
     
 endmodule
