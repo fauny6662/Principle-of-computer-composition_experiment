@@ -48,17 +48,12 @@ module alu(
                 5'b00110:result=b>>t;
                 5'b00011:result=({32{b[31]}}<<(6'd32-{1'b0,t}))|(b>>t);//算术右移
                 5'b00111:result=({32{b[31]}}<<(6'd32-{1'b0,t}))|(b>>t);
-                5'b01000:result=a;//只用来jal的alu计算
+                5'b01000:result=a;//用来jal、mfhi、mflo的alu计算
                 default: result=0;
             endcase
             assign zero =(result==0)? 1:0;
             overflow=0;
-            /*if(op==5'b10000|op==5'b10010)
-                begin
-                    if(result[31]==1)
-                        overflow=1; 
-                end*/
-            if(op==5'b10000&&a[31]==b[31]&&a[31]!=result[31])
+            if((op==5'b10000&&a[31]==b[31]&&a[31]!=result[31])||(op==5'b10010&&a[31]!=b[31]&&result[31]!=a[31]))
                 overflow=1;
         end
     initial 

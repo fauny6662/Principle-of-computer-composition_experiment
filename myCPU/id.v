@@ -29,7 +29,7 @@ module id(
     RegWrite_exe,
     RegWrite_mem,
     RegWrite_wb,
-    input [1:0] MemRead_mem,
+    input [2:0] MemRead_mem,
     output  RegDst,
     Branch,
     MemtoReg,
@@ -38,15 +38,18 @@ module id(
     RegWrite,
     output [1:0]Jump,
     output keep,
-    output [1:0]MemWrite,MemRead,
+    output [1:0]MemWrite,
+    output [2:0]MemRead,
     output [4:0]Aluctr,
     output [4:0]rs,rt,rd,
     output [31:0]immi_1, immi_2,
     output reg [31:0]out1,out2,
-    output [31:0]pc_4_out
+    output [31:0]pc_4_out,
+    output mtc0,mfc0
     );
     wire [1:0]hd_rs,hd_rt;
     wire [31:0]busA,busB;
+    wire mfhi, mflo;
     control control1(clk,ctrl,
     instruction[31:26],
     instruction[5:0],
@@ -62,7 +65,8 @@ module id(
     keep,
     MemWrite,
     MemRead,
-    Aluctr);
+    Aluctr,
+    mtc0,mfc0,mfhi,mflo);
     assign rs=instruction[25:21];
     assign rt=(Jump==2'b11)?5'b11111:instruction[20:16];
     assign rd=instruction[15:11];
@@ -80,6 +84,11 @@ module id(
             if(Jump==2'b11)//如果是jal指令
                 begin
                     out1=pc+8;
+                    out2=32'b0;
+                end
+            else if(mfhi==1 || mflo==1)//如果是mfhi和mflo指令，则先视作向目标寄存器写入32'b0
+                begin
+                    out1=32'b0;
                     out2=32'b0;
                 end
             else if(id_lw==1)

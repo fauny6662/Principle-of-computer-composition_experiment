@@ -27,10 +27,14 @@ module mem_wb(
     RegWrite,
     input [31:0]Aluout,pc,rdata,
     input [4:0]rd,
+    input mfc0,
+    input [31:0]except_data,
     output reg MemtoReg_out ,
     RegWrite_out,
     output reg [31:0]Aluout_out,pc_out,rdata_out,
-    output reg [4:0]rd_out 
+    output reg [4:0]rd_out,
+    output reg mfc0_out,
+    output reg except_data_out
     );
     always @(posedge clk)
         begin
@@ -42,7 +46,8 @@ module mem_wb(
                     rd_out<=5'b0;
                     pc_out<=32'b0;
                     rdata_out<=0;
-                    
+                    mfc0_out<=0;
+                    except_data_out<=32'b0;
                 end
             else 
                 begin
@@ -52,7 +57,8 @@ module mem_wb(
                     rd_out<=rd;
                     pc_out<=pc;
                     rdata_out<=rdata;
-                    
+                    mfc0_out<=mfc0;
+                    except_data_out<=except_data;
                 end
         end
 endmodule

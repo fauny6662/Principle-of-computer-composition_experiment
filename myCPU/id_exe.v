@@ -27,22 +27,26 @@ module id_exe(
     MemtoReg,
     Alusrc1,
     Alusrc2,
-    input [1:0]MemWrite,MemRead,
+    input [1:0]MemWrite,
+    input [2:0]MemRead,
     input RegWrite,
     input [4:0]Aluctr,
     input [4:0]rt,rd,
     input [31:0]immi1,immi2,busA,busB,pc_4,pc,
+    input mtc0,mfc0,
     output reg RegDst_out,
     Branch_out,
     MemtoReg_out,
     Alusrc1_out,
     Alusrc2_out,
     id_lw_out,
-    output reg [1:0]MemWrite_out,MemRead_out,
+    output reg [1:0]MemWrite_out,
+    output reg [2:0]MemRead_out,
     output reg RegWrite_out,
     output reg[4:0]Aluctr_out,
     output reg [4:0]rt_out,rd_out,
-    output reg [31:0]pc_4_out,pc_out,busA_out,busB_out,immi1_out,immi2_out
+    output reg [31:0]pc_4_out,pc_out,busA_out,busB_out,immi1_out,immi2_out,
+    output reg mtc0_out,mfc0_out
     );
     always @(posedge clk)
         begin
@@ -54,7 +58,7 @@ module id_exe(
                     Alusrc2_out<=0;
                     MemWrite_out<=2'b00;
                     RegWrite_out<=0;
-                    MemRead_out<=2'b00;
+                    MemRead_out<=3'b000;
                     RegDst_out<=0;
                     Aluctr_out<=5'b0;
                     rd_out<=5'b0;
@@ -66,6 +70,8 @@ module id_exe(
                     immi2_out<=32'b0;
                     pc_out<=32'b0;
                     id_lw_out<=0;
+                    mtc0_out<=0;
+                    mfc0_out<=0;
                 end
             else if(id_lw==1)
                 begin
@@ -75,7 +81,7 @@ module id_exe(
                     Alusrc2_out<=0;
                     MemWrite_out<=2'b00;
                     RegWrite_out<=0;
-                    MemRead_out<=2'b00;
+                    MemRead_out<=3'b000;
                     RegDst_out<=0;
                     Aluctr_out<=5'b0;
                     rd_out<=5'b0;
@@ -87,6 +93,8 @@ module id_exe(
                     immi2_out<=32'b0;
                     pc_out<=32'b0;
                     id_lw_out<=1;
+                    mtc0_out<=0;
+                    mfc0_out<=0;
                 end
             else
                 begin
@@ -108,6 +116,8 @@ module id_exe(
                     immi2_out<=immi2;
                     pc_out<=pc;
                     id_lw_out<=0;
+                    mtc0_out<=mtc0;
+                    mfc0_out<=mfc0;
                 end
 
         end

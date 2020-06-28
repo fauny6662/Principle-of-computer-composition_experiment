@@ -27,22 +27,26 @@ module exe(
     MemtoReg,
     Alusrc1,
     Alusrc2,
-    input [1:0]MemWrite,MemRead,
+    input [1:0]MemWrite,
+    input [2:0]MemRead,
     input RegWrite,
     input [4:0]Aluctr,
     input [4:0]rt,rd,
     input [31:0]pc_4,
     input [31:0]busA,busB,
     input [31:0]immi1,immi2,
+    input mtc0,mfc0,
     output reg 
     Branch_out,
     MemtoReg_out,
-    output reg [1:0]MemWrite_out,MemRead_out,
+    output reg [1:0]MemWrite_out,
+    output reg [2:0]MemRead_out,
     output reg RegWrite_out,
     output [31:0]Aluout,
     output reg [31:0]busB_out,
     output zero,overflow,
-    output reg [4:0]rd_out
+    output reg [4:0]rd_out,
+    output reg mtc0_out, mfc0_out
     );
     wire [31:0]busC,busD;
     always @(*)
@@ -55,6 +59,8 @@ module exe(
                 MemRead_out=0;
                 RegWrite_out=0;
                 busB_out=0;
+                mtc0_out=0;
+                mfc0_out=0;
             end
         else
             begin
@@ -65,6 +71,8 @@ module exe(
                 MemRead_out=MemRead;
                 RegWrite_out=RegWrite;
                 busB_out=busB;
+                mtc0_out=mtc0;
+                mfc0_out=mfc0;
             end
     mux2 mu1(immi1,busA,Alusrc1,busC);
     mux2 mu2(immi2,busB,Alusrc2,busD);

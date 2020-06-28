@@ -24,7 +24,7 @@ module mem(
     input clk,reset,
     input Branch,
     MemtoReg,RegWrite,
-    input [1:0]memR,
+    input [2:0]memR,
     input [31:0]Aluout,data_sram_rdata,
     input zero,
     input [4:0]rd,
@@ -43,7 +43,7 @@ module mem(
     always @(*)
         begin
             case (memR)//读内存
-            2'b01: //lb
+            3'b001: //lb
                 begin
                     case (Aluout[1:0])
                         2'b00: rdata_mem = {{24{data_sram_rdata[7]}}, data_sram_rdata[7:0]};
@@ -52,7 +52,16 @@ module mem(
                         2'b11: rdata_mem = {{24{data_sram_rdata[31]}}, data_sram_rdata[31:24]};
                     endcase
                 end
-            2'b10: //lh
+            3'b101: //lbu
+                begin
+                    case (Aluout[1:0])
+                        2'b00: rdata_mem = {{24{1'b0}}, data_sram_rdata[7:0]};
+                        2'b01: rdata_mem = {{24{1'b0}}, data_sram_rdata[15:8]};
+                        2'b10: rdata_mem = {{24{1'b0}}, data_sram_rdata[23:16]};
+                        2'b11: rdata_mem = {{24{1'b0}}, data_sram_rdata[31:24]};
+                    endcase
+                end
+            3'b010: //lh
                 begin
                     case (Aluout[1:0])
                         2'b00: rdata_mem = {{16{data_sram_rdata[15]}}, data_sram_rdata[15:0]};
@@ -60,7 +69,15 @@ module mem(
                         2'b10: rdata_mem = {{16{data_sram_rdata[31]}}, data_sram_rdata[31:16]};
                     endcase
                 end
-            2'b11: //lw
+            3'b110: //lhu
+                begin
+                    case (Aluout[1:0])
+                        2'b00: rdata_mem = {{16{1'b0}}, data_sram_rdata[15:0]};
+                        2'b01: rdata_mem = {{16{1'b0}}, data_sram_rdata[23:8]};
+                        2'b10: rdata_mem = {{16{1'b0}}, data_sram_rdata[31:16]};
+                    endcase
+                end
+            2'b011: //lw
                 begin
                     rdata_mem = data_sram_rdata;
                 end

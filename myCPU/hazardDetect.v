@@ -23,7 +23,7 @@
 module hazardDetect(
     input clk,reset,
     input [4:0]rs_id,rt_id,rt_exe,
-    input [1:0]lw_pre,
+    input [2:0]lw_pre,
     input branch,
     input [1:0]jump,
     input [31:0]instruction_id,
@@ -54,7 +54,7 @@ module hazardDetect(
             if_lw=0;
             address_out=32'b0;
                     #0.5;
-                    if(lw_pre!=2'b00) //前一条lw/lh/lb
+                    if(lw_pre!=3'b000) //前一条lw/lh/lb
                         begin
                             if(rt_exe==rs_id||rt_exe==rt_id)
                                 begin

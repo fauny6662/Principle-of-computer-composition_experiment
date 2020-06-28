@@ -41,7 +41,8 @@ module datapath(
     wire [31:0]pc_4_exe;
     wire [31:0]wd;
     wire [31:0]pc_exe,pc_mem;
-    wire [1:0]MemWrite,MemWrite_exe,MemWrite_exe2,MemWrite_mem,MemWrite_mem2,MemWrite_wb,MemRead,MemRead_exe,MemRead_exe2,MemRead_mem,MemRead_mem2,MemRead_wb;
+    wire [1:0]MemWrite,MemWrite_exe,MemWrite_exe2,MemWrite_mem,MemWrite_mem2,MemWrite_wb;
+    wire [2:0]MemRead,MemRead_exe,MemRead_exe2,MemRead_mem,MemRead_mem2,MemRead_wb;
     wire RegDst,
     Branch,
     MemtoReg,
@@ -65,7 +66,8 @@ module datapath(
     RegWrite_mem2,
     MemtoReg_wb,
     RegWrite_wb,
-    RegWrite_wb2;
+    RegWrite_wb2,
+    mtc0,mfc0,mtc0_exe,mfc0_exe,mtc0_exe2,mfc0_exe2,mfc0_mem,mfc0_wb;
     wire [4:0]Aluctr,Aluctr_exe;
     wire [4:0]rs,rt,rd,rt_exe,rd_exe,rd_exe2,rd_mem,rd_mem2,rd_wb,rd_wb2;
     wire [31:0]immi1,immi2,immi1_exe,immi2_exe;
@@ -81,12 +83,14 @@ module datapath(
     wire [31:0]mem_data;
     wire id_lw,if_lw,id_lw_exe;
     wire [31:0]rdata_mem,rdata_mem2,address_exe;
+    wire [31:0]badAddr,count,status,cause,epc,except_data,except_data_mem,except_data_wb;
+    wire [31:0]badAddr_out,count_out,status_out,cause_out,epc_out;
 
     assign inst_sram_wen=4'b0;
     assign data_sram_en=1;
     assign pc_4=pc_4_if;
     assign inst_sram_wdata=32'b0;
-    If if1(clk,reset,address,error_address,pc_4,PcWrite,pc_src,pc_flush,if_lw,keep&overflow,pc_4_if,pc_if);
+    If if1(clk,reset,address,error_address,pc_4,PcWrite,pc_src,pc_flush,if_lw,keep|overflow,pc_4_if,pc_if);
     assign  inst_sram_addr=(reset)?0:pc_if & 32'h1fffffff;
     assign inst_sram_en=(reset)?0:1;
     if_id if_id1(clk,reset,if_flush,if_lw,if_id_write,pc_if,pc_4_if,pc_id,pc_4_id);
@@ -110,7 +114,7 @@ module datapath(
     MemWrite,
     MemRead,
     Aluctr,
-    rs,rt,rd,immi1,immi2,busA,busB,pc_4_id2
+    rs,rt,rd,immi1,immi2,busA,busB,pc_4_id2,mtc0,mfc0
     );
     hazardDetect  hazardDetect1(clk,reset,rs,rt,rt_exe,
     MemRead_exe,Branch,jump,
@@ -129,6 +133,7 @@ module datapath(
     RegWrite,
     Aluctr,
     rt,rd,immi1,immi2,busA,busB,pc_4_id2,pc_id,
+    mtc0,mfc0,
     RegDst_exe,
     Branch_exe,
     MemtoReg_exe,
@@ -139,7 +144,7 @@ module datapath(
     MemRead_exe,
     RegWrite_exe,
     Aluctr_exe,
-    rt_exe,rd_exe,pc_4_exe,pc_exe,busA_exe,busB_exe,immi1_exe,immi2_exe
+    rt_exe,rd_exe,pc_4_exe,pc_exe,busA_exe,busB_exe,immi1_exe,immi2_exe,mtc0_exe,mfc0_exe
     );
     exe exe1(clk,reset,exe_flush,RegDst_exe,
     Branch_exe,
@@ -150,15 +155,16 @@ module datapath(
     MemRead_exe,
     RegWrite_exe,
     Aluctr_exe,
-    rt_exe,rd_exe,pc_4_exe,busA_exe,busB_exe,immi1_exe,immi2_exe,
+    rt_exe,rd_exe,pc_4_exe,busA_exe,busB_exe,immi1_exe,immi2_exe,mtc0_exe,mfc0_exe,
     Branch_exe2,
     MemtoReg_exe2,
     MemWrite_exe2,
     MemRead_exe2,
     RegWrite_exe2,
-    Aluout,busB_exe2,zero,overflow,rd_exe2);
-    judge judge1(MemWrite_exe2,Aluout,busB_exe2,
-    data_sram_wen,data_sram_wdata,data_sram_addr
+    Aluout,busB_exe2,zero,overflow,rd_exe2,mtc0_exe2,mfc0_exe2);
+    judge judge1(MemWrite_exe2,Aluout,busB_exe2,rd_exe2,mtc0_exe2,mfc0_exe2,
+    badAddr_out,count_out,status_out,cause_out,epc_out,
+    data_sram_wen,data_sram_wdata,data_sram_addr,badAddr,count,status,cause,epc,except_data
     );
     exe_mem exe_mem1(clk,reset,exe_flush,
     Branch_exe2,
@@ -166,13 +172,13 @@ module datapath(
     MemWrite_exe2,
     MemRead_exe2,
     RegWrite_exe2,
-    Aluout,busB_exe2,pc_exe,zero,rd_exe2,
+    Aluout,busB_exe2,pc_exe,zero,rd_exe2,mfc0_exe2,except_data,
     Branch_mem,
     MemtoReg_mem,
     MemWrite_mem,
     MemRead_mem,
     RegWrite_mem,
-    Aluout_mem,busB_mem,pc_mem,zero_mem,rd_mem
+    Aluout_mem,busB_mem,pc_mem,zero_mem,rd_mem,mfc0_mem,except_data_mem
     );
     mem mem1(clk,reset,
     Branch_mem,
@@ -188,20 +194,24 @@ module datapath(
     mem_wb mem_wb1(clk,reset,
     MemtoReg_mem2,
     RegWrite_mem2,
-    Aluout_mem2,pc_mem,rdata_mem,rd_mem2,
+    Aluout_mem2,pc_mem,rdata_mem,rd_mem2,mfc0_mem,except_data_mem,
     MemtoReg_wb,
     RegWrite_wb,
-    Aluout_wb,debug_wb_pc,rdata_mem2,rd_wb
+    Aluout_wb,debug_wb_pc,rdata_mem2,rd_wb,mfc0_wb,except_data_wb
     );
     wb wb1(clk,reset,
     MemtoReg_wb,
     RegWrite_wb,
-    Aluout_wb,rdata_mem2,rd_wb,
+    Aluout_wb,rdata_mem2,rd_wb,mfc0_wb,except_data_wb,
     RegWrite_wb2,
     wd,rd_wb2
     );
     assign debug_wb_rf_wen={4{RegWrite_wb2}};
     assign debug_wb_rf_wnum=rd_wb2;
     assign debug_wb_rf_wdata=wd;
-    CP0 cp01(clk,reset,overflow,keep,pc_id,pc_exe,status,error_address,if_flush,id_flush,exe_flush);
+    CP0 cp01(clk,reset,overflow,keep,
+    pc_id,pc_exe,
+    badAddr,count,status,epc,cause,
+    badAddr_out,count_out,status_out,cause_out,error_address,epc_out,
+    if_flush,id_flush,exe_flush);
 endmodule

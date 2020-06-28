@@ -27,11 +27,20 @@ module wb(
     RegWrite,
     input [31:0]Aluout, rdata,//读内存实际得到的数据
     input [4:0]rd,
+    input mfc0,
+    input [31:0]except_data,
     output RegWrite_out,
-    output [31:0]dataout,
+    output reg [31:0]dataout,
     output [4:0]rd_out
     );
-    mux2 mu2(rdata,Aluout,MemtoReg,dataout);
+    always @(*)
+        begin
+            if(mfc0 == 1)
+                dataout = except_data;
+            else if(MemtoReg == 1)
+                dataout = rdata;
+            else dataout = Aluout;
+        end
     assign RegWrite_out=RegWrite;
     assign rd_out=rd;
 endmodule

@@ -21,15 +21,19 @@
 
 
 module epc(
-    input clk,reset,
+    input clk,reset,write,
     input [31:0]pc,
     output reg [31:0]pc_out
     );
     always @(posedge clk)
         begin
-            if(reset==0)
+            if(reset==1)
                 begin
-                    pc_out<=pc;
+                    pc_out<=0;
+                end
+            else if(write==1)
+                begin
+                   pc_out<=pc; 
                 end
         end
         

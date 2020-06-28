@@ -23,9 +23,13 @@
 module judge(
     input [1:0]memW,
     input [31:0]Aluout,busB,
+    input [4:0]rd,
+    input mtc0,mfc0,
+    input [31:0]badAddr_out,count_out,status_out,cause_out,epc_out,//从寄存器中读出的值
     output reg [3:0] data_sram_wen,
     output reg [31:0] data_sram_wdata,
-    output  [31:0] data_sram_addr
+    output  [31:0] data_sram_addr,
+    output reg [31:0] badAddr,count,status,cause,epc,except_data
     );
     assign data_sram_addr=Aluout& 32'h1fffffff;
     always @(*)
@@ -88,5 +92,27 @@ module judge(
                 data_sram_wen = 4'b0000;
             end
         endcase
+
+        if(mtc0)
+            begin
+                case (rd)
+                    5'd8: badAddr<=busB;
+                    5'd9: count<=busB;
+                    5'd12: status<=busB;
+                    5'd13: cause<=busB;
+                    5'd14: epc<=busB;
+                endcase
+            end
+        else if(mfc0)
+            begin
+                case (rd)
+                    5'd8: except_data=badAddr_out;
+                    5'd9: except_data=count_out;
+                    5'd12: except_data=status_out;
+                    5'd13: except_data=cause_out;
+                    5'd14: except_data=epc_out; 
+                endcase
+            end
+
     end
 endmodule

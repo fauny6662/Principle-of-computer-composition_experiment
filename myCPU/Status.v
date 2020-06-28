@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2020/06/15 14:01:05
+// Create Date: 2020/06/28 08:14:21
 // Design Name: 
-// Module Name: cause
+// Module Name: BadVAddr
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,19 +20,21 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module cause(
+module Status(
     input clk,reset,
     input write,
-    input [31:0]reason,
-    output reg [31:0]reason_out
+    input [31:0]status,
+    output reg [31:0]status_out
     );
-    always @(posedge clk)
+    always@(posedge clk)
         begin
             if(reset==1)
-                reason_out<=0;
+                begin
+                    status_out<=0;
+                end 
             else if(write==1)
                 begin
-                    reason_out<=reason;
-                end 
+                    status_out<=status;
+                end
         end
 endmodule

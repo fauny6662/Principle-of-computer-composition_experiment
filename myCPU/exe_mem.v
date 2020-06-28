@@ -25,18 +25,24 @@ module exe_mem(
     input 
     Branch,
     MemtoReg,
-    input [1:0]MemWrite,MemRead,
+    input [1:0]MemWrite,
+    input [2:0]MemRead,
     input RegWrite,
     input [31:0]Aluout,busB,pc,
     input zero,
     input [4:0]rd,
+    input mfc0,
+    input [31:0] except_data,
     output reg Branch_out,
     MemtoReg_out,
-    output reg [1:0]MemWrite_out,MemRead_out,
+    output reg [1:0]MemWrite_out,
+    output reg [2:0]MemRead_out,
     output reg RegWrite_out,
     output reg [31:0]Aluout_out,busB_out,pc_out,
     output reg zero_out,
-    output reg [4:0]rd_out 
+    output reg [4:0]rd_out,
+    output reg mfc0_out,
+    output reg [31:0]except_data_out
     );
     always @(posedge clk)
         begin
@@ -46,12 +52,14 @@ module exe_mem(
                     MemtoReg_out<=0;
                     MemWrite_out<=2'b00;
                     RegWrite_out<=0;
-                    MemRead_out<=2'b00;
+                    MemRead_out<=3'b000;
                     busB_out<=32'b0;
                     Aluout_out<=32'b0;
                     zero_out<=0;
                     rd_out<=5'b0;
                     pc_out<=32'b0;
+                    mfc0_out<=0;
+                    except_data_out<=32'b0;
                 end
             else
                 begin
@@ -65,6 +73,8 @@ module exe_mem(
                     zero_out<=zero;
                     rd_out<=rd;
                     pc_out<=pc;
+                    mfc0_out<=mfc0;
+                    except_data_out<=except_data;
                 end
         end
 endmodule

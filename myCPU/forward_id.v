@@ -27,7 +27,7 @@ module forward_id(
     rd_mem,
     input RegWrite_exe,
     RegWrite_mem,
-    input [1:0]MemRead_mem,
+    input [2:0]MemRead_mem,
     output reg [1:0]hd_rs,hd_rt
     );
     reg a,b;
@@ -53,7 +53,7 @@ module forward_id(
                         end             
                 end
             
-            if((MemRead_mem!=2'b00)&&RegWrite_mem==1)//前前一条lw/lh/lb
+            if((MemRead_mem!=3'b000)&&RegWrite_mem==1)//前前一条lw/lh/lb
                 begin
                     if(rd_mem==rs_id&&a==0)
                         begin
