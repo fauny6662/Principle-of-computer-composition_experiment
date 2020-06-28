@@ -85,7 +85,7 @@ module datapath(
     wire [31:0]rdata_mem,rdata_mem2,address_exe;
     wire [31:0]badAddr,count,status,cause,epc,except_data,except_data_mem,except_data_wb;
     wire [31:0]badAddr_out,count_out,status_out,cause_out,epc_out;
-
+    wire [31:0]alu_forward;
     assign inst_sram_wen=4'b0;
     assign data_sram_en=1;
     assign pc_4=pc_4_if;
@@ -97,7 +97,7 @@ module datapath(
     assign instruction=(reset)?0:inst_sram_rdata;
     assign instruction_id=(id_lw_exe)?instruction_id:instruction;
     id id1(clk,reset,ctrl,id_lw,id_lw_exe,pc_id,pc_4_id,instruction_id,
-    Aluout,Aluout_mem,rdata_mem,wd,
+    alu_forward,Aluout_mem,rdata_mem,wd,
     rd_exe2,rd_mem2,rd_wb2,
     RegWrite_exe,
     RegWrite_mem,
@@ -162,9 +162,11 @@ module datapath(
     MemRead_exe2,
     RegWrite_exe2,
     Aluout,busB_exe2,zero,overflow,rd_exe2,mtc0_exe2,mfc0_exe2);
-    judge judge1(MemWrite_exe2,Aluout,busB_exe2,rd_exe2,mtc0_exe2,mfc0_exe2,
+    judge judge1(MemWrite_exe2,
+    Aluout,busB_exe2,
+    rd_exe,mtc0_exe2,mfc0_exe2,
     badAddr_out,count_out,status_out,cause_out,epc_out,
-    data_sram_wen,data_sram_wdata,data_sram_addr,badAddr,count,status,cause,epc,except_data
+    data_sram_wen,data_sram_wdata,data_sram_addr,badAddr,count,status,cause,epc,except_data,alu_forward
     );
     exe_mem exe_mem1(clk,reset,exe_flush,
     Branch_exe2,
@@ -209,7 +211,7 @@ module datapath(
     assign debug_wb_rf_wen={4{RegWrite_wb2}};
     assign debug_wb_rf_wnum=rd_wb2;
     assign debug_wb_rf_wdata=wd;
-    CP0 cp01(clk,reset,overflow,keep,
+    CP0 cp01(clk,reset,overflow,keep,mtc0_exe2,
     pc_id,pc_exe,
     badAddr,count,status,epc,cause,
     badAddr_out,count_out,status_out,cause_out,error_address,epc_out,

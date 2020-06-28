@@ -34,7 +34,7 @@ module mem_wb(
     output reg [31:0]Aluout_out,pc_out,rdata_out,
     output reg [4:0]rd_out,
     output reg mfc0_out,
-    output reg except_data_out
+    output reg [31:0]except_data_out
     );
     always @(posedge clk)
         begin

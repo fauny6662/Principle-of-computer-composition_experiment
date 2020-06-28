@@ -29,8 +29,8 @@ module If(
     output [31:0]pc_out
     );
     wire [31:0] npc,t;
-    assign t=(error==1)?error_address:address;
-    assign npc=(pc_src==1)?address:pc_in;
+    assign t=(pc_src==1)?address:pc_in;
+    assign npc=(error==1)?error_address:t;
     pc pc1(PcWrite,clk,reset,npc,pc_out);
     always@(*)
         begin
